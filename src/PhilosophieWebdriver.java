@@ -22,6 +22,8 @@ public class PhilosophieWebdriver {
     private Pattern bracketPattern = Pattern.compile("\\(([^)]*)\\)");
     private String xpathQuery = "//a[ancestor::div[@class='mw-content-ltr'] and not(@class) and not(ancestor::table) and text() != '' and not(ancestor::div[@class='thumb tright']) and not(ancestor::i)]";
     List<String> breadcrumbs;
+    private int maxLinkCount;
+    private int maxIterations;
 
 
     @Before
@@ -32,13 +34,14 @@ public class PhilosophieWebdriver {
         baseUrl = "http://de.wikipedia.org/wiki/Spezial:Zuf%C3%A4llige_Seite";
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
         driver.manage().deleteAllCookies();
-
+        maxLinkCount = 50;
+        maxIterations = 1;
     }
 
     @Test
     public void testPhilosophie() throws Exception {
 
-        int i = 1;
+        int iterations = 1;
         do {
 
             driver.navigate().to(baseUrl);
@@ -46,8 +49,8 @@ public class PhilosophieWebdriver {
             breadcrumbs = new ArrayList<>();
 
             boolean aborted = false;
-            int counter = 0;
-            while (!driver.getTitle().startsWith("Philosophie") && !aborted && counter < 2000) {
+            int followedLinks = 0;
+            while (!driver.getTitle().startsWith("Philosophie") && !aborted && followedLinks < maxLinkCount) {
                 if (PageManager.getInstance().pageIsDeadEnd(driver.getCurrentUrl())) {
                     aborted = true;
                     System.out.println("Search aborted (previous search came to a dead end)");
@@ -59,7 +62,7 @@ public class PhilosophieWebdriver {
 
                         breadcrumbs.add(0, driver.getCurrentUrl());
                         driver.findElement(By.linkText(linkText)).click();
-                        counter++;
+                        followedLinks++;
                     } else {
                         aborted = true;
                         System.out.println("Search aborted (Loop detected).");
@@ -67,21 +70,19 @@ public class PhilosophieWebdriver {
                 }
             }
 
-            System.out.println(counter);
+            System.out.println(followedLinks);
 
-            if (!aborted && counter < 15) {
+            if (!aborted && followedLinks < 15) {
                 breadcrumbs.add(0, driver.getCurrentUrl());
                 updatePagesSuccessful(breadcrumbs);
             } else {
                 updatePagesUnsuccessful(breadcrumbs);
             }
 
-
-
             PageManager.getInstance().persistPages();
 
-            i++;
-        } while (i < 10);
+            iterations++;
+        } while (iterations < maxIterations);
 
         for (Page page : PageManager.getInstance().getAllPages()) {
             System.out.println(String.format("%s -> %s (%s)", page.getUrl(), page.getLinksToDestinationCount(),
