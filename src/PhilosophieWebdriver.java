@@ -20,7 +20,7 @@ public class PhilosophieWebdriver {
     private boolean acceptNextAlert = true;
     private StringBuffer verificationErrors = new StringBuffer();
     private Pattern bracketPattern = Pattern.compile("\\(([^)]*)\\)");
-    private String xpathQuery = "//a[ancestor::div[@class='mw-content-ltr'] and not(@class) and not(ancestor::table) and text() != '' and not(ancestor::div[@class='thumb tright']) and not(ancestor::i)]";
+    private String xpathQuery = "//a[ancestor::div[@class='mw-content-ltr'] and not(@class) and not(ancestor::table) and text() != '' and not(ancestor::div[@class='thumb tright']) and not(ancestor::i) and not(@href[contains(., '#')])]";
     List<String> breadcrumbs;
     private int maxLinkCount;
     private int maxIterations;
