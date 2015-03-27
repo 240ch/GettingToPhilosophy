@@ -76,7 +76,9 @@ public class PageManager {
     public void updatePage(String pageToUpdate, DestinationReacher impossible) {
         for (int i = 0; i < alreadyVisitedPages.size(); i++) {
             if (alreadyVisitedPages.get(i).getUrl().equals(pageToUpdate)) {
-                alreadyVisitedPages.get(i).setDestinationReacher(impossible);
+                if (alreadyVisitedPages.get(i).getDestinationReacher() != DestinationReacher.POSSIBLE) {
+                    alreadyVisitedPages.get(i).setDestinationReacher(impossible);
+                }
             }
         }
     }

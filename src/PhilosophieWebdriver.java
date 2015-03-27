@@ -27,15 +27,15 @@ public class PhilosophieWebdriver {
 
     @Before
     public void setUp() throws Exception {
-        System.setProperty("webdriver.firefox.bin", "D:\\Programme\\Mozilla Firefox\\firefox.exe");
+        System.setProperty("webdriver.firefox.bin", "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe");
         driver = new FirefoxDriver();
-    //    baseUrl = "http://de.wikipedia.org/wiki/Tee";
+      //  baseUrl = "http://de.wikipedia.org/wiki/Schweiz";
       //  baseUrl = "http://de.wikipedia.org/wiki/Anton_Schwob";
         baseUrl = "http://de.wikipedia.org/wiki/Spezial:Zuf%C3%A4llige_Seite";
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
         driver.manage().deleteAllCookies();
         maxLinkCount = 100;
-        maxIterations = 100;
+        maxIterations = 10;
     }
 
     @Test
@@ -43,7 +43,6 @@ public class PhilosophieWebdriver {
 
         int iterations = 1;
         do {
-
             driver.navigate().to(baseUrl);
             breadcrumbs = new ArrayList<>();
 
