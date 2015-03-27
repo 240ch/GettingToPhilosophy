@@ -19,8 +19,8 @@ public class PhilosophieWebdriver {
     private String baseUrl;
     private boolean acceptNextAlert = true;
     private StringBuffer verificationErrors = new StringBuffer();
-    private Pattern bracketPattern = Pattern.compile("\\(([^)]*)\\)");
-    private String xpathQuery = "//a[ancestor::div[@class='mw-content-ltr'] and not(@class) and not(ancestor::table) and text() != '' and not(ancestor::div[@class='thumb tright']) and not(ancestor::i) and not(@href[contains(., '#')])]";
+    private Pattern bracketPattern = Pattern.compile("(\\(([^)]*)\\)|\\[([^)]*)\\])");
+    private String xpathQuery = "//a[ancestor::div[@class='mw-content-ltr'] and not(ancestor::table) and text() != '' and not(ancestor::div[@class='thumb tright']) and not(ancestor::i) and not(@href[contains(., '#')])]";
     List<String> breadcrumbs;
     private int maxLinkCount;
     private int maxIterations;
@@ -30,11 +30,12 @@ public class PhilosophieWebdriver {
     public void setUp() throws Exception {
         System.setProperty("webdriver.firefox.bin", "D:\\Programme\\Mozilla Firefox\\firefox.exe");
         driver = new FirefoxDriver();
-        //baseUrl = "http://de.wikipedia.org/wiki/Tee";
-        baseUrl = "http://de.wikipedia.org/wiki/Spezial:Zuf%C3%A4llige_Seite";
+       // baseUrl = "http://de.wikipedia.org/wiki/Tee";
+        baseUrl = "http://de.wikipedia.org/wiki/Anton_Schwob";
+     //   baseUrl = "http://de.wikipedia.org/wiki/Spezial:Zuf%C3%A4llige_Seite";
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
         driver.manage().deleteAllCookies();
-        maxLinkCount = 50;
+        maxLinkCount = 100;
         maxIterations = 1;
     }
 
@@ -45,7 +46,6 @@ public class PhilosophieWebdriver {
         do {
 
             driver.navigate().to(baseUrl);
-
             breadcrumbs = new ArrayList<>();
 
             boolean aborted = false;
@@ -53,13 +53,11 @@ public class PhilosophieWebdriver {
             while (!driver.getTitle().startsWith("Philosophie") && !aborted && followedLinks < maxLinkCount) {
                 if (PageManager.getInstance().pageIsDeadEnd(driver.getCurrentUrl())) {
                     aborted = true;
-                    System.out.println("Search aborted (previous search came to a dead end)");
+                    System.out.println("Search aborted (previous search came to a dead end here)");
                 } else {
-
                     System.out.println(driver.getTitle());
                     String linkText = findLinkText();
                     if (linkText != null) {
-
                         breadcrumbs.add(0, driver.getCurrentUrl());
                         driver.findElement(By.linkText(linkText)).click();
                         followedLinks++;
@@ -128,10 +126,11 @@ public class PhilosophieWebdriver {
         Matcher matcher = bracketPattern.matcher(paragraph);
         if (matcher.find()) {
             String textInBrackets = "";
-            for (int i = 0; i < matcher.groupCount(); i++) {
+            int groupCount = matcher.groupCount();
+            for (int i = 0; i < groupCount; i++) {
                 if (!inBrackets) {
-                    textInBrackets = matcher.group(i + 1);
-                    if (textInBrackets.contains(text)) {
+                    textInBrackets = matcher.group(i);
+                    if (textInBrackets != null && textInBrackets.contains(text)) {
                         inBrackets = true;
                     }
                 }
